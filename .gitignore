@@ -1,0 +1,24 @@
+# Python virtual environments
+.venv/
+.venv-win/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node.js dependencies and build output
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
+__MACOSX/
+Thumbs.db

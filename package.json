@@ -1,0 +1,24 @@
+{
+  "name": "industrial-iot-telemetry-compression",
+  "version": "1.0.0",
+  "description": "Industrial IoT Telemetry Compression & Network Optimization Platform",
+  "scripts": {
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build:frontend": "npm run build --prefix frontend",
+    "dev:backend": "source .venv/bin/activate && uvicorn backend.app.main:app --reload --port 8000",
+    "test:backend": "source .venv/bin/activate && pytest backend/app/tests -v",
+    "generate:pdf": "source .venv/bin/activate && python backend/app/utils/generate_pdf.py"
+  },
+  "keywords": [
+    "huffman-coding",
+    "shannon-fano",
+    "package-merge",
+    "two-queue",
+    "industrial-iot",
+    "telemetry-compression",
+    "design-and-analysis-of-algorithms"
+  ],
+  "author": "Senior Algorithm Engineer",
+  "license": "MIT"
+}
+
