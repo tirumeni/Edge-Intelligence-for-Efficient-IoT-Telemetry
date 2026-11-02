@@ -5,7 +5,7 @@ import {
   LiveTelemetryPacket,
   OneHourProjection
 } from '../types';
-import { api } from '../services/api';
+import { api, getTelemetryWebSocketUrl } from '../services/api';
 import {
   Play,
   Pause,
@@ -59,17 +59,18 @@ export const LiveNetworkView: React.FC<LiveNetworkViewProps> = ({
 
   // Establish WebSocket connection
   useEffect(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/telemetry`;
-
-    const ws = new WebSocket(wsUrl);
+    const ws = new WebSocket(getTelemetryWebSocketUrl());
     wsRef.current = ws;
+    const keepalive = window.setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) ws.send('PING');
+    }, 30_000);
 
     ws.onopen = () => {
       setWsConnected(true);
     };
 
     ws.onmessage = (event) => {
+      if (event.data === 'PONG') return;
       try {
         const data = JSON.parse(event.data);
         if (data.type === 'TELEMETRY_UPDATE') {
@@ -101,6 +102,7 @@ export const LiveNetworkView: React.FC<LiveNetworkViewProps> = ({
     };
 
     return () => {
+      window.clearInterval(keepalive);
       ws.close();
     };
   }, []);

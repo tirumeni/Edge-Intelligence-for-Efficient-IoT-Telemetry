@@ -184,3 +184,31 @@ Frontend will be live at `http://localhost:5173`.
 - [x] 16/16 automated tests passed.
 - [x] Full-stack application built and tested.
 
+---
+
+## 9. Public Deployment (Render + Vercel)
+
+The repository includes a Render Blueprint (`render.yaml`) and Vercel SPA routing configuration (`frontend/vercel.json`). Deploy the backend first, then the frontend:
+
+### Backend on Render
+
+1. In Render, create a new **Blueprint** and connect `tirumeni/Edge-Intelligence-for-Efficient-IoT-Telemetry`.
+2. Render reads `render.yaml` from the repository root. Keep the service root directory at the repository root and select the **Free** plan.
+3. After the first deploy, open the service URL and confirm `/api/health` returns `"status": "healthy"`. The API documentation is at `/docs`.
+
+The Blueprint installs `backend/requirements.txt`, starts Uvicorn on Render's assigned port, and uses `/api/health` for health checks.
+
+### Frontend on Vercel
+
+1. Import the same GitHub repository into Vercel and set the project **Root Directory** to `frontend`.
+2. Select the Vite framework preset. The build command is `npm run build` and the output directory is `dist`.
+3. Add the environment variable `VITE_API_URL` with the Render backend origin, for example `https://iotcompress-api.onrender.com` (no trailing slash). Add it to Production and Preview as needed, then deploy.
+
+The browser client derives `wss://<backend-host>/ws/telemetry` from `VITE_API_URL` when the frontend uses HTTPS. An explicit `VITE_WS_URL` can override it. The Vercel rewrite supports SPA routes.
+
+### Connect CORS after deployment
+
+After Vercel assigns the frontend domain, update the Render service's `CORS_ORIGINS` environment variable to include that exact origin, such as `https://your-project.vercel.app` (no path or trailing slash). Keep local origins only if you still need local development. Save the setting and redeploy the backend.
+
+Render's free service can take about a minute to wake after 15 minutes without inbound traffic. The frontend sends a WebSocket keepalive every 30 seconds while connected. Free instances can restart and have ephemeral local storage, so in-memory simulation state resets on restarts or redeploys. Vercel static hosting and Render's free plan are suitable for a public demo, with those availability and state limitations.
+

@@ -10,7 +10,23 @@ import {
   BenchmarkResult
 } from '../types';
 
-const API_BASE = '/api';
+const API_ORIGIN = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+const API_BASE = `${API_ORIGIN}/api`;
+
+export function getTelemetryWebSocketUrl(): string {
+  const configuredUrl = import.meta.env.VITE_WS_URL;
+  if (configuredUrl) return configuredUrl;
+
+  if (API_ORIGIN) {
+    const url = new URL(API_ORIGIN);
+    url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    url.pathname = '/ws/telemetry';
+    return url.toString();
+  }
+
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${protocol}//${window.location.host}/ws/telemetry`;
+}
 
 export const api = {
   // Huffman
